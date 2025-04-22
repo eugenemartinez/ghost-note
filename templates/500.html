@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+    <div class="text-center"> {# Center the content #}
+        <h2>Oops! Something Went Wrong (500)</h2>
+        <p>We seem to be experiencing an internal server error.</p>
+        <p>Our team has been notified (if logging is configured), but please feel free to try again later.</p>
+        <hr>
+        <p>What would you like to do?</p>
+
+        {# Style links as buttons #}
+        <div class="action-links" style="margin-top: 1.5em;">
+            <a href="{% url 'home' %}" class="button button-primary">Return to the Homepage</a>
+            <a href="{% url 'notes:create_note' %}" class="button">Try creating a new GhostNote</a>
+        </div>
+    </div>
+{% endblock %}

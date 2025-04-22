@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}GhostNote by {{ note.username }}{% endblock %}
+
+{% block content %}
+    <p><strong>From:</strong> {{ note.username }}</p>
+    <p><strong>Posted on:</strong> {{ note.created_at|date:"F j, Y, P" }}</p> {# Format the date #}
+    <hr>
+
+    {# Container for the note content display (initially visible) #}
+    <div id="note-display">
+        <pre class="note-content">{{ note.content }}</pre>
+    </div>
+
+    {# Edit Form - Initially hidden, contains all fields needed for submission #}
+    {# We'll show/hide this form and populate its textarea dynamically #}
+    <form id="edit-form" method="post" action="{% url 'notes:edit_note' note.pk %}" style="display: none;">
+        {% csrf_token %}
+        {{ edit_form.username.as_hidden }} {# Keep username hidden #}
+
+        {# Display non-field errors from the form #}
+        {% if edit_form.non_field_errors %}
+            <div class="alert alert-error">
+                {% for err in edit_form.non_field_errors %}
+                    <p><strong>Edit Error:</strong> {{ err }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {# Modification code input - Part of the form now #}
+        <div class="form-group">
+            <label for="mod-code">Modification Code:</label>
+            <input type="text" id="mod-code" name="modification_code" required placeholder="Enter Modification Code">
+        </div>
+
+        {# Render the 'content' textarea - Part of the form now #}
+        <div class="form-group">
+            {{ edit_form.content.label_tag }}
+            {{ edit_form.content }} {# Renders the <textarea> #}
+            {% if edit_form.content.errors %}
+                <div class="alert alert-error">
+                    {% for err in edit_form.content.errors %}
+                        <p>{{ err }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# Render 'is_public' field - Part of the form now #}
+        <div class="form-group">
+            {{ edit_form.is_public }}
+            {{ edit_form.is_public.label_tag }}
+            {% if edit_form.is_public.help_text %}
+                <small style="display: block; color: #555;">{{ edit_form.is_public.help_text }}</small>
+            {% endif %}
+            {% if edit_form.is_public.errors %}
+                <div class="alert alert-error">
+                    {% for err in edit_form.is_public.errors %}
+                        <p>{{ err }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# Save and Cancel buttons within the form #}
+        <div>
+            <button type="submit" id="submit-edit" class="button button-primary">Save Changes</button>
+            <button type="button" id="cancel-edit-btn" class="button button-secondary">Cancel</button> {# Type="button" prevents form submission #}
+        </div>
+    </form>
+    {# End of Edit Form #}
+
+    <hr>
+
+    {# Initial Action Buttons (Edit/Delete) #}
+    <div id="action-buttons">
+        <button id="edit-btn" class="button button-secondary">Edit Note</button>
+        {# Apply button-danger class here #}
+        <button id="delete-btn" class="button button-danger">Delete Note</button>
+    </div>
+
+    {# Delete Form - Remains separate and initially hidden #}
+    <form id="delete-form" method="post" action="{% url 'notes:delete_note' note.pk %}" style="display: none; margin-top: 1.5em;">
+        {% csrf_token %}
+        <p class="alert alert-warning">Are you sure you want to delete this note?</p>
+        <div class="form-group">
+            <label for="delete-mod-code">Modification Code:</label>
+            <input type="text" id="delete-mod-code" name="modification_code" required placeholder="Enter Modification Code to Confirm">
+        </div>
+        {# Apply button-danger class here #}
+        <button type="submit" id="submit-delete" class="button button-danger">Confirm Delete</button>
+        <button type="button" id="cancel-delete-btn" class="button button-secondary">Cancel</button> {# Added Cancel for Delete #}
+    </form>
+
+    {# --- JavaScript --- #}
+    <script>
+        // Get references to elements
+        const noteDisplayDiv = document.getElementById('note-display');
+        const noteContentPre = noteDisplayDiv.querySelector('.note-content'); // Get the <pre> tag
+        const editForm = document.getElementById('edit-form');
+        const deleteForm = document.getElementById('delete-form');
+        const actionButtonsDiv = document.getElementById('action-buttons');
+        const editBtn = document.getElementById('edit-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn'); // Get cancel delete button
+
+        // Get form fields within the edit form
+        const editContentTextarea = editForm.querySelector('textarea[name="content"]'); // Find textarea by name
+        const editIsPublicCheckbox = editForm.querySelector('input[name="is_public"]'); // Find checkbox by name
+        const editModCodeInput = editForm.querySelector('input[name="modification_code"]');
+
+        // Store original state
+        const originalContent = noteContentPre.textContent;
+        const originalIsPublic = {{ note.is_public|yesno:"true,false" }}; // Get initial state from Django template
+
+        // --- Event Listeners ---
+
+        // EDIT button clicked
+        editBtn.addEventListener('click', () => {
+            // Populate form fields with current values
+            editContentTextarea.value = originalContent; // Use original content from <pre>
+            editIsPublicCheckbox.checked = originalIsPublic;
+            editModCodeInput.value = ''; // Clear mod code field
+
+            // Hide display and initial buttons
+            noteDisplayDiv.style.display = 'none';
+            actionButtonsDiv.style.display = 'none';
+            deleteForm.style.display = 'none'; // Ensure delete form is hidden
+
+            // Show edit form
+            editForm.style.display = 'block';
+        });
+
+        // CANCEL EDIT button clicked
+        cancelEditBtn.addEventListener('click', () => {
+            // Hide edit form
+            editForm.style.display = 'none';
+
+            // Show display and initial buttons
+            noteDisplayDiv.style.display = 'block';
+            actionButtonsDiv.style.display = 'block';
+        });
+
+        // DELETE button clicked
+        deleteBtn.addEventListener('click', () => {
+            // Hide display and initial buttons
+            noteDisplayDiv.style.display = 'none'; // Hide content display too
+            actionButtonsDiv.style.display = 'none';
+            editForm.style.display = 'none'; // Ensure edit form is hidden
+
+            // Show delete form
+            deleteForm.style.display = 'block';
+        });
+
+        // CANCEL DELETE button clicked
+        cancelDeleteBtn.addEventListener('click', () => {
+            // Hide delete form
+            deleteForm.style.display = 'none';
+
+            // Show display and initial buttons
+            noteDisplayDiv.style.display = 'block'; // Show content display again
+            actionButtonsDiv.style.display = 'block';
+        });
+
+        // --- Initial State Check (for validation errors on POST) ---
+        const hasEditFormErrors = {{ edit_form.errors|yesno:"true,false" }};
+        if (hasEditFormErrors) {
+            // If validation failed on POST, show the edit form immediately
+            noteDisplayDiv.style.display = 'none';
+            actionButtonsDiv.style.display = 'none';
+            editForm.style.display = 'block';
+        }
+        // Delete errors are handled by messages, so no need to auto-show delete form
+
+    </script>
+{% endblock %}

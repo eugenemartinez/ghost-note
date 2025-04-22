@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Public GhostNotes{% endblock %}
+
+{% block content %}
+    <h2>Public GhostNotes</h2>
+    <p>A random selection of notes users have chosen to make public.</p>
+    <hr>
+
+    {% if notes_page and notes_page.object_list %}
+        <div class="notes-list">
+            {% for note in notes_page %}
+                <div class="note-card">
+                    <p><strong>From:</strong> {{ note.username }}</p>
+                    <p>{{ note.content|truncatechars:100 }}</p>
+                    <p><small>Posted: {{ note.created_at|date:"F j, Y" }}</small></p>
+                    {# Add button-secondary class here #}
+                    <a href="{% url 'notes:note_detail' note.pk %}" class="button button-small button-secondary">View Note</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <hr>
+
+        {# Pagination Controls - Add classes for styling #}
+        <div class="pagination text-center"> {# Center align pagination #}
+            <span class="step-links">
+                {% if notes_page.has_previous %}
+                    <a href="?page=1" class="button button-small button-secondary">&laquo; first</a>
+                    <a href="?page={{ notes_page.previous_page_number }}" class="button button-small button-secondary">previous</a>
+                {% endif %}
+
+                <span class="current" style="margin: 0 0.5em; color: #bdbdbd;"> {# Adjusted color for dark mode #}
+                    Page {{ notes_page.number }} of {{ notes_page.paginator.num_pages }}.
+                </span>
+
+                {% if notes_page.has_next %}
+                    <a href="?page={{ notes_page.next_page_number }}" class="button button-small button-secondary">next</a>
+                    <a href="?page={{ notes_page.paginator.num_pages }}" class="button button-small button-secondary">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        {# Message is handled by messages framework, but provide a fallback #}
+        <p>No public GhostNotes found to display.</p>
+    {% endif %}
+
+{% endblock %}

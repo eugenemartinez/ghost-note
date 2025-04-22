@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}GhostNote - Simple Anonymous Notes{% endblock %}
+
+{% block content %}
+    {# Use h1 for the main page title now that it's removed from base.html #}
+    <h1 class="text-center">Simple, Anonymous Notes Online</h1> {# Centered the main title #}
+
+    <p style="text-align: center; font-size: 1.1rem; color: #ffffff;"> {# Centered and slightly styled the intro paragraph #}
+        GhostNote lets you quickly post anonymous notes online. Share ideas, confessions,
+        or anything else without signing up. You'll get a unique link to view your note
+        and a secret modification code to edit or delete it later.
+    </p>
+
+    <hr>
+
+    {# Center the call-to-action buttons #}
+    <div class="cta-buttons text-center" style="margin-top: 1.5em; margin-bottom: 1.5em;"> {# Removed inline style, added text-center class and adjusted margin #}
+        <a href="{% url 'notes:create_note' %}" class="button button-primary">Create a New GhostNote</a>
+        <a href="{% url 'notes:random_note' %}" class="button">View a Random Note</a>
+        {# Change the URL name here: #}
+        <a href="{% url 'notes:notes_list' %}" class="button button-secondary">View Public Notes</a>
+    </div>
+
+    <hr>
+
+    <h3>How It Works:</h3>
+    <ul>
+        <li><strong>Truly Anonymous:</strong> No accounts, no tracking. Your note isn't tied to you.</li>
+        <li><strong>Simple & Fast:</strong> Just write your content and post.</li>
+        <li><strong>Edit/Delete Control:</strong> Use the unique modification code provided after creation to manage your note. Keep it safe!</li>
+        <li><strong>Public Option:</strong> Choose to make your note public for others to see in the random list.</li> {# Added point about public notes #}
+    </ul>
+
+{% endblock %}

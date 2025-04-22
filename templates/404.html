@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+    <div class="text-center"> {# Center the content #}
+        <h2>Oops! Page Not Found (404)</h2>
+        <p>The page you requested could not be found.</p>
+        <p>Perhaps it was deleted, or the link you followed was incorrect.</p>
+        <hr>
+        <p>What would you like to do?</p>
+
+        {# Style links as buttons #}
+        <div class="action-links" style="margin-top: 1.5em;">
+            <a href="{% url 'home' %}" class="button button-primary">Go to the Homepage</a>
+            <a href="{% url 'notes:create_note' %}" class="button">Create a new GhostNote</a>
+            <a href="{% url 'notes:random_note' %}" class="button button-secondary">View a Random Note</a>
+        </div>
+    </div>
+{% endblock %}

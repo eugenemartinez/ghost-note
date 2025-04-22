@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}No GhostNotes Found{% endblock %}
+
+{% block content %}
+    <h1>No GhostNotes Found</h1>
+    <p>It seems there are no notes in the system yet.</p>
+    <p>Why not be the first to <a href="{% url 'notes:create_note' %}">create one</a>?</p>
+
+    {# Removed footer links as they are in base.html #}
+{% endblock %}

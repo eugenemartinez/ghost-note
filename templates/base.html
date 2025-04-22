@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GhostNote{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'notes/style.css' %}">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="container"> {# Inner container for header content #}
+            <div class="logo">
+                <a href="{% url 'home' %}">GhostNote</a> {# Link logo to home #}
+            </div>
+            <nav>
+                {# Apply button classes to nav links #}
+                <a href="{% url 'notes:create_note' %}" class="button button-small button-primary">Create Note</a>
+                <a href="{% url 'notes:notes_list' %}" class="button button-small button-secondary">Public Notes</a>
+                <a href="{% url 'notes:random_note' %}" class="button button-small">Random Note</a>
+            </nav>
+        </div>
+    </header>
+
+    {# Main content area container #}
+    <main class="container" role="main"> {# Use <main> tag for semantics #}
+
+        {# Display Django Messages #}
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    {# Use message tags for CSS classes (e.g., 'success', 'error', 'warning', 'info', 'debug') #}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        <!-- Child templates will override this block -->
+        <p>Default content - you should override this block.</p>
+        {% endblock %}
+
+    </main> {# End main content container #}
+
+    <footer class="site-footer">
+        <div class="container"> {# Inner container for footer content #}
+            <p>
+                &copy; {% now "Y" %} GhostNote Project. |
+                <a href="{% url 'home' %}">Home</a> |
+                <a href="{% url 'notes:create_note' %}">Create</a> |
+                <a href="{% url 'notes:notes_list' %}">Public Notes</a>
+                {# Add other links if desired, e.g., privacy policy #}
+            </p>
+        </div>
+    </footer>
+
+    {# --- Add this JavaScript block --- #}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messagesContainer = document.querySelector('.messages');
+
+            if (messagesContainer) {
+                messagesContainer.addEventListener('click', (event) => {
+                    // Check if the clicked element is our copy button
+                    if (event.target.classList.contains('copy-mod-code-btn')) {
+                        const button = event.target;
+                        const codeToCopy = button.dataset.code; // Get code from data-code attribute
+
+                        if (codeToCopy && navigator.clipboard) {
+                            navigator.clipboard.writeText(codeToCopy).then(() => {
+                                // Success feedback: temporarily change button text
+                                const originalText = button.textContent;
+                                button.textContent = 'Copied!';
+                                button.disabled = true; // Optional: disable briefly
+                                setTimeout(() => {
+                                    button.textContent = originalText;
+                                    button.disabled = false; // Re-enable
+                                }, 2000); // Revert after 2 seconds
+                            }).catch(err => {
+                                console.error('Failed to copy code: ', err);
+                                // Optional: Provide error feedback to the user
+                                alert('Failed to copy code. Please copy it manually.');
+                            });
+                        } else if (!navigator.clipboard) {
+                             alert('Clipboard API not available. Please copy the code manually.');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    {# --- End JavaScript block --- #}
+
+</body>
+</html>
