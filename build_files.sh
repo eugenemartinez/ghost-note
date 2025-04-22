@@ -3,15 +3,14 @@
 # Exit on error
 set -e
 
-echo "Building project..."
+echo "Running build commands..."
 
-# Install dependencies
-pip install -r requirements.txt
+# pip install -r requirements.txt # No longer needed here, @vercel/python does this
 
-# Collect static files
-python manage.py collectstatic --noinput
+# Collect static files (add --clear for cleaner builds)
+python manage.py collectstatic --noinput --clear
 
 # Apply database migrations
 python manage.py migrate --noinput
 
-echo "Build finished."
+echo "Build commands finished."
