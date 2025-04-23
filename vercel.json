@@ -7,7 +7,7 @@
       "config": {
         "maxLambdaSize": "15mb",
         "runtime": "python3.9",
-        "buildCommand": "echo '--- Running build commands directly ---' && python manage.py collectstatic --noinput --clear && echo '--- collectstatic finished ---' && python manage.py migrate --noinput && echo '--- migrate finished ---'"
+        "buildCommand": "echo '--- TEST: buildCommand is running ---'"
       }
     }
   ],
