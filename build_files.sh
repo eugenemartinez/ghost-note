@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# Exit on error
-set -e
+# set -e # Temporarily remove exit on error to see more logs
 
-echo "Running build commands..."
+echo "--- build_files.sh starting ---"
 
-# pip install -r requirements.txt # No longer needed here, @vercel/python does this
+echo "--- Running collectstatic ---"
+python manage.py collectstatic --noinput --clear || echo "!!! collectstatic failed !!!"
 
-# Collect static files (add --clear for cleaner builds)
-python manage.py collectstatic --noinput --clear
+echo "--- Running migrate ---"
+python manage.py migrate --noinput || echo "!!! migrate failed !!!"
 
-# Apply database migrations
-python manage.py migrate --noinput
-
-echo "Build commands finished."
+echo "--- build_files.sh finished ---"
